@@ -59,10 +59,6 @@ export default function JobModal({
   const [formError, setFormError] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
 
-  // ✅ Quiz options — uniquement en mode création
-  const [generateQuiz, setGenerateQuiz] = useState(true);
-  const [numQuestions, setNumQuestions] = useState(25);
-
   const isEditMode = !!initialData;
 
   const items = useMemo(
@@ -122,7 +118,6 @@ export default function JobModal({
       } else {
         setForm(emptyForm);
         setAssignedUserId("");
-        setGenerateQuiz(true);
         setNumQuestions(25);
       }
 
@@ -206,11 +201,7 @@ export default function JobModal({
       sexe: String(form.sexe || "").trim(),
       typeDiplome: String(form.typeDiplome || "").trim(),
 
-      // ✅ Transmis uniquement en mode création
-      ...(!isEditMode && {
-        generateQuiz,
-        numQuestions: generateQuiz ? numQuestions : 0,
-      }),
+      
     });
   }
 
@@ -481,130 +472,8 @@ export default function JobModal({
                 </div>
               </div>
 
-              {/* SELECT USERS */}
-              <div>
-                <label className={labelBase}>Affectation responsable métier</label>
-                <select
-                  value={assignedUserId}
-                  onChange={(e) => setAssignedUserId(e.target.value)}
-                  className="w-full h-12 px-4 py-3 rounded-2xl 
-                             border border-gray-200 dark:border-gray-600 
-                             bg-white dark:bg-gray-700 
-                             text-gray-800 dark:text-gray-100
-                             focus:border-[#6CB33F] dark:focus:border-emerald-500 
-                             focus:ring-4 focus:ring-[#6CB33F]/15 dark:focus:ring-emerald-500/20 
-                             outline-none transition-colors"
-                >
-                  <option value="">-- Choisir un utilisateur --</option>
-                  {users.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      [{u.role}] {u.prenom} {u.nom}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
-              {/* ✅ QUIZ — uniquement en mode création */}
-              {!isEditMode && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5 space-y-4">
-                  {/* Checkbox header */}
-                  <label className="flex items-center gap-3 cursor-pointer select-none">
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        checked={generateQuiz}
-                        onChange={(e) => setGenerateQuiz(e.target.checked)}
-                        className="sr-only"
-                      />
-                      <div
-                        className={`w-11 h-6 rounded-full transition-colors duration-200 ${
-                          generateQuiz
-                            ? "bg-[#6CB33F] dark:bg-emerald-500"
-                            : "bg-gray-300 dark:bg-gray-600"
-                        }`}
-                      />
-                      <div
-                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
-                          generateQuiz ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <BrainCircuit className="h-4 w-4 text-[#6CB33F] dark:text-emerald-400" />
-                        <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                          Générer un quiz technique
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Un quiz IA sera créé automatiquement à la publication de
-                        l&apos;offre.
-                      </p>
-                    </div>
-                  </label>
-
-                  {/* Nombre de questions — visible seulement si cochée */}
-                  {generateQuiz && (
-                    <div className="pl-14 space-y-2 sm:space-y-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 sm:whitespace-nowrap">
-                          Nombre de questions
-                        </label>
-
-                        <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleNumQuestions(numQuestions - 1)}
-                            className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 
-                     text-gray-700 dark:text-gray-300 font-bold
-                     hover:bg-gray-100 dark:hover:bg-gray-700
-                     transition-colors flex items-center justify-center"
-                          >
-                            −
-                          </button>
-
-                          <input
-                            type="number"
-                            min={1}
-                            max={30}
-                            value={numQuestions}
-                            onChange={(e) => handleNumQuestions(e.target.value)}
-                            className="w-16 h-9 text-center rounded-xl 
-                     border border-gray-200 dark:border-gray-600 
-                     bg-white dark:bg-gray-700 
-                     text-gray-800 dark:text-gray-100 font-bold
-                     focus:border-[#6CB33F] dark:focus:border-emerald-500
-                     focus:ring-2 focus:ring-[#6CB33F]/20 dark:focus:ring-emerald-500/20
-                     outline-none transition-colors"
-                          />
-
-                          <button
-                            type="button"
-                            onClick={() => handleNumQuestions(numQuestions + 1)}
-                            className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 
-                     text-gray-700 dark:text-gray-300 font-bold
-                     hover:bg-gray-100 dark:hover:bg-gray-700
-                     transition-colors flex items-center justify-center"
-                          >
-                            +
-                          </button>
-
-                          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            (max 30)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {!generateQuiz && (
-                    <p className="pl-14 text-xs text-gray-400 dark:text-gray-500 italic">
-                      Aucun quiz ne sera généré. Vous pourrez en créer un
-                      manuellement plus tard.
-                    </p>
-                  )}
-                </div>
-              )}
+          
 
               {/* WEIGHTS */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -679,9 +548,7 @@ export default function JobModal({
                       : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                   }`}
               >
-                {!isEditMode && generateQuiz
-                  ? `Enregistrer + Générer ${numQuestions} questions`
-                  : "Enregistrer"}
+              
               </button>
 
               <button
@@ -690,7 +557,6 @@ export default function JobModal({
                   setForm(emptyForm);
                   setFormError("");
                   setAssignedUserId("");
-                  setGenerateQuiz(true);
                   setNumQuestions(25);
                   onClose();
                 }}

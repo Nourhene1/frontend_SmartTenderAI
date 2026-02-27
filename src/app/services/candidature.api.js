@@ -9,21 +9,17 @@ export const getMatchingStats = () => api.get("/candidatures/stats/matching");
 export const getAcademicStats = () => api.get("/candidatures/stats/academic");
 
 // ── Pré-entretien ──────────────────────────────────────────────
-export const togglePreInterview = (id) =>
-  api.patch(`/candidatures/${id}/pre-interview`);
+export const togglePreInterview = (id, currentValue) =>
+  api.patch(`/candidatures/${id}/pre-interview`, { preInterview: !currentValue });
 
 export const getPreInterviewList = () =>
   api.get("/candidatures/pre-interview");
 
-// ── 🆕 Envoyer fiche + quiz ───────────────────────────────────
-export const sendDocuments = (candidatureId, payload) =>
-  api.post(`/candidatures/${candidatureId}/send-documents`, payload);
-export const getCandidatureById = (id) => api.get(`/candidatures/${id}`);
-
+//
 
 export const getPreInterviewCandidates = async () => {
   const { data } = await axios.get(
-    `${API_URL}/api/candidatures/preinterview`,
+    `${API_URL}/candidatures/preinterview`,
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

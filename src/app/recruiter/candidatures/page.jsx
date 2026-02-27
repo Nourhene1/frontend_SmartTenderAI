@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getCandidaturesWithJob } from "../../services/candidature.api";
 import Pagination from "../../components/Pagination";
-import { Search, FileText, Linkedin, Phone, Mail,Calendar } from "lucide-react";
+import { Search, FileText, Linkedin, Phone, Mail } from "lucide-react";
 
 
 /* ================= CONFIG ================= */
@@ -55,8 +55,21 @@ function getPhone(c) {
   return (
     safeStr(c?.personalInfoForm?.telephone) ||
     safeStr(c?.extracted?.parsed?.telephone) ||
+    safeStr(c?.extracted?.parsed?.personal_info?.telephone) ||
     ""
   );
+}
+
+function getTenderTitre(c) {
+  return (
+    safeStr(c?.tenderTitre) ||
+    safeStr(c?.tender?.titre) ||
+    "—"
+  );
+}
+
+function getTenderOrg(c) {
+  return safeStr(c?.tender?.organisation) || safeStr(c?.tender?.client) || "";
 }
 
 function getLinkedIn(c) {
@@ -115,7 +128,8 @@ export default function CandidaturesTablePage() {
       (c) =>
         getFullName(c).toLowerCase().includes(query) ||
         getEmail(c).toLowerCase().includes(query) ||
-        safeStr(c?.jobTitle).toLowerCase().includes(query)
+        getTenderTitre(c).toLowerCase().includes(query) ||
+        getTenderOrg(c).toLowerCase().includes(query)
     );
   }, [candidatures, q]);
 
@@ -217,9 +231,14 @@ export default function CandidaturesTablePage() {
                 )}
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                  <span className="inline-flex items-center px-4 py-2 rounded-full bg-[#E9F5E3] dark:bg-gray-700 text-[#4E8F2F] dark:text-emerald-400 text-xs font-semibold border border-[#d7ebcf] dark:border-gray-600 transition-colors">
-                    {safeStr(c?.jobTitle) || "Poste non spécifié"}
-                  </span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="inline-flex items-center px-4 py-2 rounded-full bg-[#E9F5E3] dark:bg-gray-700 text-[#4E8F2F] dark:text-emerald-400 text-xs font-semibold border border-[#d7ebcf] dark:border-gray-600 transition-colors">
+                      {getTenderTitre(c)}
+                    </span>
+                    {getTenderOrg(c) && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500 pl-1">{getTenderOrg(c)}</span>
+                    )}
+                  </div>
 
                   {getCvUrl(c) && (
                     <a
@@ -233,10 +252,7 @@ export default function CandidaturesTablePage() {
                   )}
                 </div>
 
-                <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                  <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                  {formatDate(c?.createdAt)}
-                </div>
+              
               </div>
             ))}
           </div>
@@ -262,7 +278,7 @@ export default function CandidaturesTablePage() {
                       Linkedin
                     </th>
                     <th className="text-left px-6 lg:px-8 py-5 font-extrabold uppercase text-xs tracking-wider">
-                      Poste
+                      Appel d&apos;offres
                     </th>
                     <th className="text-left px-6 lg:px-8 py-5 font-extrabold uppercase text-xs tracking-wider">
                       Date
@@ -300,9 +316,14 @@ export default function CandidaturesTablePage() {
                         )}
                       </td>
                       <td className="px-6 lg:px-8 py-5">
-                        <span className="inline-flex items-center px-4 py-2 rounded-full bg-[#E9F5E3] dark:bg-gray-700 text-[#4E8F2F] dark:text-emerald-400 text-xs font-semibold border border-[#d7ebcf] dark:border-gray-600 transition-colors">
-                          {safeStr(c?.jobTitle) || "N/A"}
-                        </span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="inline-flex items-center px-4 py-2 rounded-full bg-[#E9F5E3] dark:bg-gray-700 text-[#4E8F2F] dark:text-emerald-400 text-xs font-semibold border border-[#d7ebcf] dark:border-gray-600 transition-colors">
+                            {getTenderTitre(c)}
+                          </span>
+                          {getTenderOrg(c) && (
+                            <span className="text-xs text-gray-400 dark:text-gray-500 pl-1">{getTenderOrg(c)}</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 lg:px-8 py-5 text-gray-600 dark:text-gray-400">
                         {formatDate(c?.createdAt)}

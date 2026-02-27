@@ -14,54 +14,53 @@ export function middleware(req) {
       : null;
 
   const role = (req.cookies.get("role")?.value || "").trim().toUpperCase();
-  const isAdmin = role === "ADMIN";
+  const isAdmin       = role === "ADMIN";
+  const isResponsable = role === "RESPONSABLE_METIER";
+  const isCandidate   = role === "CANDIDATE";
 
-  const isRecruiterPath = pathname.startsWith("/recruiter");
-  const isResponsablePath =
-    pathname.startsWith("/ResponsableMetier") ||
-    pathname.startsWith("/responsableMetier");
+  const isRecruiterPath   = pathname.startsWith("/recruiter");
+  const isResponsablePath = pathname.startsWith("/responsable");
+  const isCandidatePath   = pathname.startsWith("/candidate/dashboard") ||
+                            pathname.startsWith("/candidate/my-applications");
 
-  const isLoginPage = pathname.startsWith("/login");
+  const isLoginPage    = pathname.startsWith("/login");
   const isUnauthorized = pathname.startsWith("/unauthorized");
-  const isProtected = isRecruiterPath || isResponsablePath;
+  const isProtected    = isRecruiterPath || isResponsablePath || isCandidatePath;
 
   const redirect = (to) => {
     const url = req.nextUrl.clone();
     url.pathname = to;
     const res = NextResponse.redirect(url);
-    res.headers.set(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, private",
-    );
+    res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
     res.headers.set("Pragma", "no-cache");
     res.headers.set("Expires", "0");
     return res;
   };
 
-  // 1) Protected + pas connecté => login
+  // 1) Protected + pas connecté → /login unique
   if (isProtected && !token) return redirect("/login");
 
   // 2) Routing par rôle
-  if (isRecruiterPath && token && !isAdmin) return redirect("/unauthorized");
-  if (isResponsablePath && token && isAdmin) return redirect("/unauthorized");
+  if (isRecruiterPath   && token && !isAdmin)       return redirect("/unauthorized");
+  if (isResponsablePath && token && !isResponsable) return redirect("/unauthorized");
+  if (isCandidatePath   && token && !isCandidate)   return redirect("/unauthorized");
 
-  // 3) Connecté et va /login
+  // 3) Connecté et va /login → rediriger selon rôle
   if (isLoginPage && token)
     return redirect(
-      isAdmin ? "/recruiter/dashboard" : "/ResponsableMetier/candidatures",
+      isAdmin       ? "/recruiter/dashboard"       :
+      isResponsable ? "/responsable/dashboard"     :
+      isCandidate   ? "/candidate/my-applications" :
+                      "/unauthorized"
     );
 
   // 4) No cache pages sensibles
   if (isProtected || isLoginPage || isUnauthorized) {
     const res = NextResponse.next();
-    res.headers.set(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, private",
-    );
+    res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
     res.headers.set("Pragma", "no-cache");
     res.headers.set("Expires", "0");
     res.headers.set("x-middleware-cache", "no-cache");
-
     return res;
   }
 

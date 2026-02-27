@@ -9,12 +9,8 @@ import {
   updateJob,
 } from "../../services/job.api";
 import JobModal from "./JobModal";
-import { getUsers } from "../../services/ResponsableMetier.api";
 import Pagination from "../../components/Pagination";
 import {
-  CheckCircle2,
-  XCircle,
-  Clock,
   Briefcase,
   Calendar,
   CalendarClock,
@@ -29,9 +25,7 @@ function formatDate(date) {
 }
 
 function getJobStatus(job) {
-  const s = (job?.status || "").toString().toUpperCase().trim();
-  if (["CONFIRMEE", "REJETEE", "EN_ATTENTE", "VALIDEE"].includes(s)) return s;
-  return "EN_ATTENTE";
+  return "CONFIRMEE";
 }
 
 function isExpired(job) {
@@ -49,37 +43,14 @@ function isInactive(job) {
 /* ================= STATUS CONFIG ================= */
 const STATUS_CONFIG = {
   CONFIRMEE: {
-    label: "Publiée", // 👈 IMPORTANT
+    label: "Publiée",
     bg: "bg-emerald-100 dark:bg-emerald-900/30",
     text: "text-emerald-700 dark:text-emerald-400",
     border: "border-emerald-200 dark:border-emerald-800",
     icon: Send,
     cardBorder: "border-emerald-200 dark:border-emerald-800",
   },
-  VALIDEE: {
-    label: "Validée",
-    bg: "bg-blue-100 dark:bg-blue-900/30",
-    text: "text-blue-700 dark:text-blue-400",
-    border: "border-blue-200 dark:border-blue-800",
-    icon: CheckCircle2,
-    cardBorder: "border-blue-200 dark:border-blue-800",
-  },
-  EN_ATTENTE: {
-    label: "En attente",
-    bg: "bg-amber-100 dark:bg-amber-900/30",
-    text: "text-amber-700 dark:text-amber-400",
-    border: "border-amber-200 dark:border-amber-800",
-    icon: Clock,
-    cardBorder: "border-amber-200 dark:border-amber-500/40",
-  },
-  REJETEE: {
-    label: "Rejetée",
-    bg: "bg-red-100 dark:bg-red-900/30",
-    text: "text-red-700 dark:text-red-400",
-    border: "border-red-200 dark:border-red-800",
-    icon: XCircle,
-    cardBorder: "border-red-300 dark:border-red-700",
-  },
+
 };
 
 const EXPIRED_BADGE = {
@@ -90,7 +61,7 @@ const EXPIRED_BADGE = {
 };
 
 function StatusBadges({ status, expired }) {
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.EN_ATTENTE;
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG.CONFIRMEE;
   const Icon = config.icon;
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -109,10 +80,7 @@ function StatusBadges({ status, expired }) {
 
 /* ================= TABS ================= */
 const STATUS_TABS = [
-  { key: "EN_ATTENTE", label: "En attente" },
-  { key: "VALIDEE", label: "Validées" },
   { key: "CONFIRMEE", label: "Publiées" },
-  { key: "REJETEE", label: "Rejetées" },
   { key: "INACTIVE", label: "Inactives" },
 ];
 
@@ -191,12 +159,10 @@ export default function JobsPage() {
   const counts = useMemo(() => {
     const c = {
       all: normalizedJobs.length,
-      EN_ATTENTE: 0,
-      VALIDEE: 0,
-      CONFIRMEE: 0, // = Publiées
-      REJETEE: 0,
-      INACTIVE: 0
-    }; normalizedJobs.forEach((j) => {
+      CONFIRMEE: 0,
+      INACTIVE: 0,
+    };
+    normalizedJobs.forEach((j) => {
       if (c[j._normalizedStatus] !== undefined) c[j._normalizedStatus]++;
       if (isInactive(j)) c.INACTIVE++;
     });
@@ -215,20 +181,14 @@ export default function JobsPage() {
   /* Color helpers */
   function colorMap(key, active) {
     return {
-      EN_ATTENTE: active ? "bg-amber-500 text-white" : "text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20",
-      VALIDEE: active ? "bg-blue-500 text-white" : "text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20",
       CONFIRMEE: active ? "bg-green-600 text-white" : "text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20",
-      REJETEE: active ? "bg-red-500 text-white" : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20",
       INACTIVE: active ? "bg-gray-600 text-white" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
     }[key];
   }
 
   function badgeMap(key, active) {
     return {
-      EN_ATTENTE: active ? "bg-white/25 text-white" : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
-      VALIDEE: active ? "bg-white/25 text-white" : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
       CONFIRMEE: active ? "bg-white/25 text-white" : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-      REJETEE: active ? "bg-white/25 text-white" : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
       INACTIVE: active ? "bg-white/25 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400",
     }[key];
   }
@@ -313,7 +273,7 @@ export default function JobsPage() {
           {paginatedJobs.map((job) => {
             const status = job._normalizedStatus;
             const expired = job._expired;
-            const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.EN_ATTENTE;
+            const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.CONFIRMEE;
 
             return (
               <div

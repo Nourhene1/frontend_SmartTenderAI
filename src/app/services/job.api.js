@@ -77,6 +77,3 @@ export function validateJob(id) {
   return axios.put(`${API_URL}/jobs/${id}/validate`, {}, { headers: authHeaders() });
 }
 
-export function getMyJobsWithoutQuiz() {
-  return axios.get(`${API_URL}/jobs/without-quiz`, { headers: authHeaders() });
-}
