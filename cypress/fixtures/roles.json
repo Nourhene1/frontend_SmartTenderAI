@@ -1,0 +1,27 @@
+{
+  "roles": [
+    { "id": "1", "_id": "1", "name": "ADMIN" },
+    { "id": "2", "_id": "2", "name": "HR_MANAGER" },
+    { "id": "3", "_id": "3", "name": "DEVELOPER" },
+    { "id": "4", "_id": "4", "name": "GUEST" },
+    { "id": "5", "_id": "5", "name": "FINANCE_ANALYST" },
+    { "id": "6", "_id": "6", "name": "PROJECT_MANAGER" }
+  ],
+  "newRole": {
+    "name": "IT_SUPPORT"
+  },
+  "updatedRole": {
+    "name": "SENIOR_DEVELOPER"
+  },
+  "errorMessages": {
+    "roleExists": "Ce rôle existe déjà",
+    "serverError": "Erreur serveur",
+    "loadError": "Erreur lors du chargement des rôles",
+    "cannotDelete": "Impossible de supprimer ce rôle"
+  },
+  "successMessages": {
+    "roleAdded": "Rôle ajouté avec succès",
+    "roleUpdated": "Rôle modifié avec succès",
+    "roleDeleted": "Rôle supprimé"
+  }
+}

@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ============================================
+   TAILWIND V4 - ACTIVER LE DARK MODE
+============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   MODE CLAIR - VOS COULEURS ORIGINALES
+============================================ */
+:root {
+  --background: #F6F8F6;
+  --foreground: #171717;
+  --navbar-bg: rgba(255, 255, 255, 0.8);
+  --navbar-border: #e5e7eb;
+}
+
+/* ============================================
+   MODE SOMBRE
+============================================ */
+.dark {
+  --background: #030712;
+  --foreground: #f3f4f6;
+  --navbar-bg: rgba(17, 24, 39, 0.85);
+  --navbar-border: #374151;
+}
+
+/* ============================================
+   HTML & BODY
+============================================ */
+html {
+  background-color: var(--background);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   CUSTOM RANGE SLIDER
+============================================ */
+.range-green {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.range-green::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #16a34a;
+  border: 2px solid white;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.range-green::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #16a34a;
+  border: 2px solid white;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
