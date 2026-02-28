@@ -103,7 +103,7 @@ export default function MyCandidaturesPage() {
             <FileText className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune candidature pour le moment</p>
             <button
-              onClick={() => router.push("/tenders")}
+              onClick={() => router.push("/jobs")}
               className="mt-4 px-6 py-2 bg-[#6CB33F] text-white rounded-xl text-sm font-semibold hover:bg-[#4E8F2F] transition"
             >
               Voir les offres

@@ -324,8 +324,8 @@ export default function Navbar() {
 
             {/* LOGO */}
             <Link href="/" className="flex items-center">
-              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[300px] sm:w-[150px] dark:hidden" />
-              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[300px] sm:w-[150px] hidden dark:block" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[160px] xs:w-[180px] sm:w-[220px] md:w-[240px] dark:hidden object-contain" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[160px] xs:w-[180px] sm:w-[220px] md:w-[240px] hidden dark:block object-contain" />
             </Link>
 
             {/* DESKTOP MENU */}

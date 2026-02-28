@@ -172,7 +172,7 @@ export default function DocumentsPage() {
 
     setDownloadingId(id);
     try {
-      const res = await fetch(`${BASE}/api/documents/${id}/download`, {
+      const res = await fetch(`${BASE}/documents/${id}/download`, {
         credentials: "include",
         headers: { Authorization: `Bearer ${token}` },
       });
