@@ -109,33 +109,33 @@ export default function AuthPage() {
   const [tab, setTab] = useState("login"); // login | register | forgot
 
   // Login
-  const [lEmail, setLEmail]       = useState("");
-  const [lPass, setLPass]         = useState("");
+  const [lEmail, setLEmail] = useState("");
+  const [lPass, setLPass] = useState("");
   const [lShowPass, setLShowPass] = useState(false);
-  const [lErr, setLErr]           = useState("");
-  const [lLoading, setLLoading]   = useState(false);
+  const [lErr, setLErr] = useState("");
+  const [lLoading, setLLoading] = useState(false);
 
   // Register
-  const [rNom, setRNom]           = useState("");
-  const [rPrenom, setRPrenom]     = useState("");
-  const [rEmail, setREmail]       = useState("");
-  const [rPass, setRPass]         = useState("");
+  const [rNom, setRNom] = useState("");
+  const [rPrenom, setRPrenom] = useState("");
+  const [rEmail, setREmail] = useState("");
+  const [rPass, setRPass] = useState("");
   const [rShowPass, setRShowPass] = useState(false);
-  const [rErr, setRErr]           = useState("");
-  const [rOk, setROk]             = useState("");
-  const [rLoading, setRLoading]   = useState(false);
+  const [rErr, setRErr] = useState("");
+  const [rOk, setROk] = useState("");
+  const [rLoading, setRLoading] = useState(false);
 
   // Forgot
-  const [fEmail, setFEmail]       = useState("");
-  const [fErr, setFErr]           = useState("");
-  const [fOk, setFOk]             = useState("");
-  const [fLoading, setFLoading]   = useState(false);
+  const [fEmail, setFEmail] = useState("");
+  const [fErr, setFErr] = useState("");
+  const [fOk, setFOk] = useState("");
+  const [fLoading, setFLoading] = useState(false);
 
   // ── Panel texts ──────────────────────────────────────
   const panelTexts = {
-    login:    { title: "Bienvenue", sub: "Connectez-vous pour accéder à votre espace personnel." },
+    login: { title: "Bienvenue", sub: "Connectez-vous pour accéder à votre espace personnel." },
     register: { title: "Rejoignez-nous", sub: "Créez votre compte candidat et postulez aux appels d'offres." },
-    forgot:   { title: "Récupération", sub: "Pas de panique ! Entrez votre email et nous vous enverrons un code." },
+    forgot: { title: "Récupération", sub: "Pas de panique ! Entrez votre email et nous vous enverrons un code." },
   };
   const panel = panelTexts[tab];
 
@@ -143,12 +143,12 @@ export default function AuthPage() {
   async function handleLogin(e) {
     e.preventDefault(); setLErr(""); setLLoading(true);
     try {
-      const res   = await login(lEmail, lPass);
+      const res = await login(lEmail, lPass);
       const token = res?.data?.token;
-      const user  = res?.data?.user;
+      const user = res?.data?.user;
       if (!token || !user) throw new Error("Réponse invalide");
 
-      const role   = String(user?.role || "").trim().toUpperCase();
+      const role = String(user?.role || "").trim().toUpperCase();
       const maxAge = 60 * 60 * 24 * 7;
 
       document.cookie = `token=${encodeURIComponent(token)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
@@ -158,9 +158,9 @@ export default function AuthPage() {
       window.dispatchEvent(new Event("user-updated"));
 
       // ✅ Redirection selon le rôle
-      if (role === "ADMIN")               router.replace("/recruiter/tenders");
-      else if (role === "CANDIDATE")      router.replace("/candidat/my-applications");
-      else                                router.replace("/unauthorized");
+      if (role === "ADMIN") router.replace("/recruiter/tenders");
+      else if (role === "CANDIDATE") router.replace("/candidat/my-applications");
+      else router.replace("/unauthorized");
 
       router.refresh();
     } catch (err) {
@@ -207,8 +207,14 @@ export default function AuthPage() {
             <div className="absolute bottom-20 right-10 w-24 h-24 bg-white/5 rounded-full pointer-events-none" />
 
             <div className="relative z-10">
-              <Image src="/images/smartTenderIA_Logo.png" alt="SmartTenderIA" width={160} height={55} className="mb-10 brightness-0 invert" />
-              <h1 className="text-[38px] font-bold leading-tight mb-4 transition-all duration-500">
+              <Image
+                src="/images/smartTenderIA_Logo.png"
+                alt="SmartTenderIA"
+                width={300}
+                height={150}
+                className="mb-12 brightness-0 invert"   // ← augmenté mb-10 → mb-12
+                priority
+              />              <h1 className="text-[38px] font-bold leading-tight mb-4 transition-all duration-500">
                 {panel.title}
               </h1>
               <p className="text-[16px] text-white/85 max-w-xs leading-relaxed transition-all duration-500">
@@ -231,9 +237,22 @@ export default function AuthPage() {
 
             {/* Logo mobile */}
             <div className="lg:hidden flex justify-center mb-6">
-              <Image src="/images/smartTenderIA_Logo.png" alt="SmartTenderIA" width={140} height={50} className="dark:hidden" />
-              <Image src="/images/smartTenderIA_Logo_dark.png"    alt="SmartTenderIA" width={140} height={50} className="hidden dark:block" />
-            </div>
+              <Image
+                src="/images/smartTenderIA_Logo.png"
+                alt="SmartTenderIA"
+                width={300}
+                height={150}
+                className="mb-12 brightness-0 invert"   // ← augmenté mb-10 → mb-12
+                priority
+              />
+              <Image
+                src="/images/smartTenderIA_Logo.png"
+                alt="SmartTenderIA"
+                width={300}
+                height={150}
+                className="mb-12 brightness-0 invert"   // ← augmenté mb-10 → mb-12
+                priority
+              />            </div>
 
             {/* ── Tabs Login / Register ── */}
             {tab !== "forgot" && (
