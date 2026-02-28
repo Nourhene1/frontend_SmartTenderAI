@@ -26,7 +26,6 @@ function NotificationIcon({ type }) {
       return <span className={`${base} bg-green-100 dark:bg-green-900/40`}><Check className="w-4 h-4 text-green-600 dark:text-green-400" /></span>;
     case "JOB_REJECTED":
       return <span className={`${base} bg-red-100 dark:bg-red-900/40`}><X className="w-4 h-4 text-red-600 dark:text-red-400" /></span>;
-   
     default:
       return <span className={`${base} bg-gray-100 dark:bg-gray-700`}><Bell className="w-4 h-4 text-gray-500" /></span>;
   }
@@ -178,14 +177,11 @@ export default function Navbar() {
 
   const [user, setUser] = useState(null);
   const [openMobile, setOpenMobile] = useState(false);
-  const [openCandidatures, setOpenCandidatures] = useState(false);
-  const [openAdmin, setOpenAdmin] = useState(false);
-  const [openFormulaires, setOpenFormulaires] = useState(false);
-
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [openNotif, setOpenNotif] = useState(false);
   const [loadingNotif, setLoadingNotif] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const notifRef = useRef(null);
   const dropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
@@ -207,9 +203,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setOpenMobile(false);
-    setOpenCandidatures(false);
-    setOpenAdmin(false);
-    setOpenFormulaires(false);
     setOpenNotif(false);
   }, [pathname]);
 
@@ -218,7 +211,7 @@ export default function Navbar() {
     try {
       const res = await getUnreadCount();
       setUnreadCount(res.data.count || 0);
-    } catch { }
+    } catch {}
   }, [user]);
 
   useEffect(() => {
@@ -230,9 +223,6 @@ export default function Navbar() {
   const handleOpenNotif = async () => {
     const willOpen = !openNotif;
     setOpenNotif(willOpen);
-    setOpenCandidatures(false);
-    setOpenAdmin(false);
-    setOpenFormulaires(false);
     if (willOpen) {
       setLoadingNotif(true);
       try {
@@ -253,7 +243,7 @@ export default function Navbar() {
         await markAsRead(notif._id);
         setNotifications((prev) => prev.map((n) => (n._id === notif._id ? { ...n, read: true } : n)));
         setUnreadCount((prev) => Math.max(0, prev - 1));
-      } catch { }
+      } catch {}
     }
     if (notif.link) router.push(notif.link);
   };
@@ -263,32 +253,34 @@ export default function Navbar() {
       await markAllAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
-    } catch { }
+    } catch {}
   };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const inBell = notifRef.current && notifRef.current.contains(e.target);
-      const inDropdown = dropdownRef.current && dropdownRef.current.contains(e.target);
-      const inMobileDropdown = mobileDropdownRef.current && mobileDropdownRef.current.contains(e.target);
-      if (!inBell && !inDropdown && !inMobileDropdown) setOpenNotif(false);
+      if (
+        notifRef.current && notifRef.current.contains(e.target) ||
+        dropdownRef.current && dropdownRef.current.contains(e.target) ||
+        mobileDropdownRef.current && mobileDropdownRef.current.contains(e.target)
+      ) return;
+      setOpenNotif(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const isActive = (path) => pathname === path;
+  const isActive = (path) => pathname === path || pathname.startsWith(path);
   const isAdmin = user?.role === "ADMIN";
-  const isCandidate = user?.role === "CANDIDATE";                   // ✅ NOUVEAU
+  const isCandidate = user?.role === "CANDIDATE";
 
-  const isInCandidatures =
-    pathname.startsWith("/recruiter/candidatures") ||
+  const isInCandidatures = 
+    pathname.startsWith("/recruiter/candidatures") || 
     pathname.startsWith("/recruiter/CandidatureAnalysis");
 
-  // ✅ FIX: variable manquante → causait "isInAdmin is not defined"
-
   async function handleLogout() {
-    try { await logout(); } catch { }
+    try {
+      await logout();
+    } catch {}
     finally {
       document.cookie = "token=; Path=/; Max-Age=0; SameSite=Lax";
       document.cookie = "role=; Path=/; Max-Age=0; SameSite=Lax";
@@ -306,15 +298,10 @@ export default function Navbar() {
   const linkBase = "px-3 py-2 rounded-full font-semibold transition text-sm whitespace-nowrap";
   const activeLink = "bg-[#6CB33F] text-white shadow";
   const inactiveLink = "text-gray-600 dark:text-gray-300 hover:text-[#4E8F2F] dark:hover:text-[#86efac]";
-  const dropdownBase = "absolute left-0 mt-2 w-64 rounded-xl shadow-lg border transition-colors";
-  const dropdownLight = "bg-white border-gray-200";
-  const dropdownDark = "dark:bg-gray-800 dark:border-gray-700";
-  const dropdownItemBase = "block px-4 py-3 transition";
-  const dropdownActive = "bg-[#6CB33F]/10 text-[#4E8F2F] font-semibold";
-  const dropdownHover = "hover:bg-gray-50 dark:hover:bg-gray-700";
 
   const BellButton = ({ isMobile }) => (
-    <button onClick={handleOpenNotif}
+    <button
+      onClick={handleOpenNotif}
       className={`relative p-2.5 rounded-full transition-colors ${isMobile ? "hover:bg-gray-100/70 dark:hover:bg-gray-700/50" : "hover:bg-gray-200/70 dark:hover:bg-gray-700/50"}`}
       aria-label="Notifications"
     >
@@ -337,23 +324,22 @@ export default function Navbar() {
 
             {/* LOGO */}
             <Link href="/" className="flex items-center">
-              <Image src="/images/optylab_logo.png" alt="Optylab" width={180} height={60} priority className="h-auto w-[140px] sm:w-[180px] dark:hidden" />
-              <Image src="/images/logo_dark.png" alt="Optylab" width={180} height={60} priority className="h-auto w-[140px] sm:w-[180px] hidden dark:block" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[300px] sm:w-[150px] dark:hidden" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="IATender" width={300} height={150} priority className="h-auto w-[300px] sm:w-[150px] hidden dark:block" />
             </Link>
 
             {/* DESKTOP MENU */}
             <div className="hidden md:flex items-center bg-[#F4F7F5] dark:bg-gray-800/60 rounded-full p-1 gap-1 transition-colors duration-200">
               {!isAdmin && !isCandidate && (
                 <Link href="/jobs" className={`${linkBase} ${isActive("/jobs") ? activeLink : inactiveLink}`}>
-                  Offres d&apos;emploi
+                  Offres d'emploi
                 </Link>
               )}
 
-              {/* ✅ MENU CANDIDAT */}
               {isCandidate && (
                 <>
                   <Link href="/jobs" className={`${linkBase} ${isActive("/jobs") ? activeLink : inactiveLink}`}>
-                    Offres d&apos;emploi
+                    Offres d'emploi
                   </Link>
                   <Link href="/candidat/my-applications" className={`${linkBase} ${isActive("/candidat/my-applications") ? activeLink : inactiveLink}`}>
                     Mes candidatures
@@ -363,49 +349,27 @@ export default function Navbar() {
 
               {isAdmin && (
                 <>
-                  <Link href="/recruiter/dashboard" className={`${linkBase} ${isActive("/recruiter/dashboard") ? activeLink : inactiveLink}`}>
-                    Tableau de bord
-                  </Link>
                   <Link href="/recruiter/tenders" className={`${linkBase} ${isActive("/recruiter/tenders") ? activeLink : inactiveLink}`}>
                     Gestion offres
                   </Link>
 
-                  {/* CANDIDATURES DROPDOWN */}
-                  <div className="relative">
-                    <button
-                      onClick={() => { setOpenCandidatures((v) => !v); setOpenAdmin(false); setOpenFormulaires(false); setOpenNotif(false); }}
-                      className={`${linkBase} ${isInCandidatures ? activeLink : inactiveLink}`}
-                    >
-                      Candidatures ▾
-                    </button>
-                    {openCandidatures && (
-                      <div className={`${dropdownBase} ${dropdownLight} ${dropdownDark}`}>
-                        <Link href="/recruiter/candidatures" className={`${dropdownItemBase} ${isActive("/recruiter/candidatures") ? dropdownActive : dropdownHover}`}>
-                          Liste des candidatures
-                        </Link>
-                        <Link href="/recruiter/CandidatureAnalysis" className={`${dropdownItemBase} ${isActive("/recruiter/CandidatureAnalysis") ? dropdownActive : dropdownHover}`}>
-                          Analyse des candidatures
-                        </Link>
-                        <Link href="/recruiter/PreInterviewList" className={`${dropdownItemBase} ${isActive("/recruiter/PreInterviewList") ? dropdownActive : dropdownHover}`}>
-                          Liste des pré-sélections
-                        </Link>
-                      </div>
-                    )}
-                  </div>
+                  <Link href="/recruiter/candidatures" className={`${linkBase} ${isActive("/recruiter/candidatures") ? activeLink : inactiveLink}`}>
+                    Liste candidatures
+                  </Link>
 
-                
+                  <Link href="/recruiter/CandidatureAnalysis" className={`${linkBase} ${isActive("/recruiter/CandidatureAnalysis") ? activeLink : inactiveLink}`}>
+                    Analyse candidatures
+                  </Link>
+                   <Link href="/recruiter/documents" className={`${linkBase} ${isActive("/recruiter/documents") ? activeLink : inactiveLink}`}>
+                    Analyse des documents
+                  </Link>
                 </>
               )}
             </div>
 
             {/* RIGHT SIDE (desktop) */}
             <div className="hidden md:flex items-center gap-3">
-              <button onClick={toggleTheme}
-                className="p-2.5 rounded-full hover:bg-gray-200/70 dark:hover:bg-gray-700/50 transition-colors"
-                aria-label="Changer de thème"
-              >
-                {theme === "dark" ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-gray-700" />}
-              </button>
+           
 
               {user && (
                 <div ref={notifRef}>
@@ -447,18 +411,17 @@ export default function Navbar() {
             <div className="md:hidden pb-5 pt-2">
               <div className="rounded-2xl bg-white/95 dark:bg-gray-900/85 shadow-xl border border-gray-200/70 dark:border-gray-700/60 p-4 space-y-2 backdrop-blur-sm transition-colors duration-200">
                 {!isAdmin && !isCandidate && (
-                  <Link href="/tenders" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/tenders") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
-                    Offres d&apos;emploi
+                  <Link href="/jobs" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/jobs") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                    Offres d'emploi
                   </Link>
                 )}
 
-                {/* ✅ MOBILE MENU CANDIDAT */}
                 {isCandidate && (
                   <>
-                    <Link href="/tenders" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">
-                      Offres d&apos;emploi
+                    <Link href="/jobs" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/jobs") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                      Offres d'emploi
                     </Link>
-                    <Link href="/candidate/my-applications" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">
+                    <Link href="/candidat/my-applications" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/candidat/my-applications") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
                       Mes candidatures
                     </Link>
                   </>
@@ -466,12 +429,18 @@ export default function Navbar() {
 
                 {isAdmin && (
                   <>
-                    <Link href="/recruiter/dashboard" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">Tableau de bord</Link>
-                    <Link href="/recruiter/tenders" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">Gestion offres</Link>
-                    <Link href="/recruiter/candidatures" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">Liste des candidatures</Link>
-                    <Link href="/recruiter/CandidatureAnalysis" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">Analyse des candidatures</Link>
-                    <Link href="/recruiter/PreInterviewList" className="block px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60">Liste des pré-sélections</Link>
-                  
+                    <Link href="/recruiter/tenders" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/recruiter/tenders") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                      Gestion offres
+                    </Link>
+                    <Link href="/recruiter/candidatures" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/recruiter/candidatures") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                      Liste des candidatures
+                    </Link>
+                    <Link href="/recruiter/CandidatureAnalysis" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/recruiter/CandidatureAnalysis") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                      Analyse des candidatures
+                    </Link>
+                    <Link href="/recruiter/documents" className={`block px-5 py-3.5 rounded-xl font-medium transition ${isActive("/recruiter/documents") ? "bg-[#6CB33F] text-white" : "text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60"}`}>
+                      Analyse des documents
+                    </Link>
                   </>
                 )}
 
@@ -479,6 +448,7 @@ export default function Navbar() {
                   <button onClick={toggleTheme} className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 transition-colors">
                     {theme === "dark" ? <><Sun className="h-5 w-5 text-amber-400" /><span>Mode clair</span></> : <><Moon className="h-5 w-5 text-gray-700" /><span>Mode sombre</span></>}
                   </button>
+
                   {!user ? (
                     <Link href="/login" className="block px-5 py-3.5 rounded-xl font-semibold text-[#6CB33F] hover:bg-gray-100/70 dark:hover:bg-gray-800/60">
                       Connexion

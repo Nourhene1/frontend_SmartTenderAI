@@ -638,16 +638,7 @@ export default function CandidatureAnalysisPage() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
               Analyse Candidatures
             </h1>
-            <a href="/recruiter/PreInterviewList"
-              className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm whitespace-nowrap self-start sm:self-center">
-              <UserCheck className="w-4 h-4" />
-              Pré-sélectionnés
-              {preselectedCount > 0 && (
-                <span className="ml-1 bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {preselectedCount}
-                </span>
-              )}
-            </a>
+            
           </div>
 
           {/* Filtres */}

@@ -158,8 +158,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event("user-updated"));
 
       // ✅ Redirection selon le rôle
-      if (role === "ADMIN")               router.replace("/recruiter/dashboard");
-      else if (role === "RESPONSABLE_METIER") router.replace("/responsable/dashboard");
+      if (role === "ADMIN")               router.replace("/recruiter/tenders");
       else if (role === "CANDIDATE")      router.replace("/candidat/my-applications");
       else                                router.replace("/unauthorized");
 
@@ -208,7 +207,7 @@ export default function AuthPage() {
             <div className="absolute bottom-20 right-10 w-24 h-24 bg-white/5 rounded-full pointer-events-none" />
 
             <div className="relative z-10">
-              <Image src="/images/optylab_logo.png" alt="Optylab" width={160} height={55} className="mb-10 brightness-0 invert" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="SmartTenderIA" width={160} height={55} className="mb-10 brightness-0 invert" />
               <h1 className="text-[38px] font-bold leading-tight mb-4 transition-all duration-500">
                 {panel.title}
               </h1>
@@ -232,8 +231,8 @@ export default function AuthPage() {
 
             {/* Logo mobile */}
             <div className="lg:hidden flex justify-center mb-6">
-              <Image src="/images/optylab_logo.png" alt="Optylab" width={140} height={50} className="dark:hidden" />
-              <Image src="/images/logo_dark.png"    alt="Optylab" width={140} height={50} className="hidden dark:block" />
+              <Image src="/images/smartTenderIA_Logo.png" alt="SmartTenderIA" width={140} height={50} className="dark:hidden" />
+              <Image src="/images/smartTenderIA_Logo_dark.png"    alt="SmartTenderIA" width={140} height={50} className="hidden dark:block" />
             </div>
 
             {/* ── Tabs Login / Register ── */}
